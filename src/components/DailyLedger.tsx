@@ -5,6 +5,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Plus, ArrowLeft, TrendingUp, TrendingDown, Trash2, Wallet, Users, WifiOff } from "lucide-react";
 import { ledgerDb, type Customer, type Transaction } from "../lib/ledgerDb";
+import DailyLedger from "./components/DailyLedger";
+function App() {
+  return <DailyLedger />;
+}
+export default App;
 
 export default function DailyLedger() {
   const [customers, setCustomers] = useState<Customer[]>([]);
