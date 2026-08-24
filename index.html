@@ -9,10 +9,21 @@
     <meta property="og:description" content="An application built with Google AI Studio." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#047857" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    if ("serviceWorker" in navigator) {
+
+  window.addEventListener("load", () => {
+
+    navigator.serviceWorker.register("/sw.js").catch(console.error);
+
+  });
+
+}
   </body>
 </html>
 
