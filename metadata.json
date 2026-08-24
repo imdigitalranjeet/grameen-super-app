@@ -1,0 +1,6 @@
+{
+  "name": "Gramin: Village Super App",
+  "description": "All-in-one super app for villagers: farm & daily expenses, crop plantation & fertilizer logs, smart reminders, and occasion gift registry.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
