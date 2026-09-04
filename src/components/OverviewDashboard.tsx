@@ -20,6 +20,7 @@ import {
 import { VillageSuperAppState } from '../types';
 import { translations } from '../utils/translations';
 import { TabKey } from './TabNavigation';
+import { WeatherForecastWidget } from './WeatherForecastWidget';
 
 interface OverviewDashboardProps {
   state: VillageSuperAppState;
@@ -241,61 +242,13 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
         </div>
       </div>
 
-      {/* Two Columns: Weather & Agronomy Advisory + Urgent Reminders */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Weather & Agronomy Advisory Widget */}
-        <div id="weather-advisory-widget" className="lg:col-span-1 bg-white border border-neutral-200 rounded-2xl p-5 shadow-2xs space-y-4">
-          <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
-            <div className="flex items-center gap-2">
-              <CloudSun className="w-5 h-5 text-amber-600" />
-              <h2 className="text-sm font-bold text-neutral-900">
-                {t.overview.weatherCardTitle}
-              </h2>
-            </div>
-            <span className="text-[11px] px-2 py-0.5 bg-emerald-50 text-emerald-800 font-semibold rounded-md border border-emerald-200">
-              {state.language === 'hi' ? 'आज का मौसम' : 'Today'}
-            </span>
-          </div>
+      {/* 7-Day Agricultural Weather Forecast Grounded with Google Search */}
+      <WeatherForecastWidget language={state.language} />
 
-          <div className="flex items-center justify-between bg-neutral-50 p-3 rounded-xl border border-neutral-200/60">
-            <div>
-              <p className="text-2xl font-bold text-neutral-900">29°C</p>
-              <p className="text-xs text-neutral-500">{state.language === 'hi' ? 'हल्की धूप व हवा' : 'Partly Cloudy & Breezy'}</p>
-            </div>
-            <div className="space-y-1 text-right text-xs text-neutral-600">
-              <div className="flex items-center gap-1.5 justify-end">
-                <Droplets className="w-3.5 h-3.5 text-blue-600" />
-                <span>{state.language === 'hi' ? 'नमी: 68%' : 'Humidity: 68%'}</span>
-              </div>
-              <div className="flex items-center gap-1.5 justify-end">
-                <Wind className="w-3.5 h-3.5 text-teal-600" />
-                <span>{state.language === 'hi' ? 'हवा: 12 km/h' : 'Wind: 12 km/h'}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-3 bg-emerald-50/70 border border-emerald-200/70 rounded-xl space-y-1.5">
-            <p className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
-              <span>🌾</span>
-              <span>{state.language === 'hi' ? 'किसान परामर्श (Kisan Advisory):' : 'Farm Recommendation:'}</span>
-            </p>
-            <p className="text-xs text-emerald-900 leading-relaxed">
-              {t.overview.weatherAdvice}
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => onNavigateTab('tools')}
-            className="w-full flex items-center justify-center gap-2 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors border border-emerald-200"
-          >
-            <Bot className="w-4 h-4 text-emerald-700" />
-            <span>{state.language === 'hi' ? 'किसान AI सहायक से पूछें' : 'Ask Kisan AI Assistant'}</span>
-          </button>
-        </div>
-
+      {/* Two Columns: Priority Reminders & Recent Activity Stream */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Priority Reminders & Tasks */}
-        <div id="urgent-reminders-widget" className="lg:col-span-2 bg-white border border-neutral-200 rounded-2xl p-5 shadow-2xs space-y-4">
+        <div id="urgent-reminders-widget" className="bg-white border border-neutral-200 rounded-2xl p-5 shadow-2xs space-y-4">
           <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
             <div className="flex items-center gap-2">
               <BellRing className="w-5 h-5 text-emerald-800" />
@@ -328,7 +281,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
                     <button
                       type="button"
                       onClick={() => onToggleReminder(rem.id)}
-                      className="mt-0.5 w-5 h-5 rounded-md border border-neutral-400 hover:border-emerald-600 flex items-center justify-center bg-white text-transparent hover:text-emerald-700 transition-colors"
+                      className="mt-0.5 w-5 h-5 rounded-md border border-neutral-400 hover:border-emerald-600 flex items-center justify-center bg-white text-transparent hover:text-emerald-700 transition-colors cursor-pointer"
                       title={t.reminders.markDone}
                     >
                       <CheckCircle2 className="w-4 h-4" />
@@ -379,68 +332,68 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({
             )}
           </div>
         </div>
-      </div>
 
-      {/* Recent Activity Stream */}
-      <div id="overview-recent-activity" className="bg-white border border-neutral-200 rounded-2xl p-5 shadow-2xs space-y-4">
-        <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
-          <h2 className="text-sm font-bold text-neutral-900">
-            {t.overview.recentActivities}
-          </h2>
-          <button
-            onClick={() => onNavigateTab('expenses')}
-            className="text-xs font-semibold text-emerald-800 hover:underline"
-          >
-            {t.overview.viewAll}
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {/* Latest Expenses */}
-          <div className="space-y-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500 flex items-center justify-between">
-              <span>{state.language === 'hi' ? 'नवीनतम खर्चे' : 'Latest Expenses'}</span>
-              <span className="text-neutral-400 font-normal">₹</span>
-            </h3>
-            {state.expenses.slice(0, 3).map((exp) => (
-              <div key={exp.id} className="p-3 bg-neutral-50 rounded-xl border border-neutral-200/70 flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-semibold text-neutral-900">{exp.title}</p>
-                  <p className="text-[11px] text-neutral-500">
-                    {exp.date} • {exp.isFarming ? '🌾 Farming' : '🛒 Daily'} {exp.quantityUsed && `• ${exp.quantityUsed}`}
-                  </p>
-                </div>
-                <span className="text-xs font-bold text-neutral-900">
-                  ₹{exp.amount.toLocaleString('en-IN')}
-                </span>
-              </div>
-            ))}
+        {/* Recent Activity Stream */}
+        <div id="overview-recent-activity" className="bg-white border border-neutral-200 rounded-2xl p-5 shadow-2xs space-y-4">
+          <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+            <h2 className="text-sm font-bold text-neutral-900">
+              {t.overview.recentActivities}
+            </h2>
+            <button
+              onClick={() => onNavigateTab('expenses')}
+              className="text-xs font-semibold text-emerald-800 hover:underline"
+            >
+              {t.overview.viewAll}
+            </button>
           </div>
 
-          {/* Latest Gifts / Shagun */}
-          <div className="space-y-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500 flex items-center justify-between">
-              <span>{state.language === 'hi' ? 'नवीनतम शगुन प्रविष्टियां' : 'Latest Shagun Records'}</span>
-              <span className="text-neutral-400 font-normal">🎁</span>
-            </h3>
-            {state.gifts.slice(0, 3).map((gift) => (
-              <div key={gift.id} className="p-3 bg-neutral-50 rounded-xl border border-neutral-200/70 flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-semibold text-neutral-900">
-                    {gift.personName}
-                  </p>
-                  <p className="text-[11px] text-neutral-500">
-                    {gift.occasion} • {gift.type === 'received' ? '📥 Recv' : '📤 Given'}
-                  </p>
-                </div>
-                <div className="text-right">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Latest Expenses */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500 flex items-center justify-between">
+                <span>{state.language === 'hi' ? 'नवीनतम खर्चे' : 'Latest Expenses'}</span>
+                <span className="text-neutral-400 font-normal">₹</span>
+              </h3>
+              {state.expenses.slice(0, 3).map((exp) => (
+                <div key={exp.id} className="p-3 bg-neutral-50 rounded-xl border border-neutral-200/70 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-semibold text-neutral-900">{exp.title}</p>
+                    <p className="text-[11px] text-neutral-500">
+                      {exp.date} • {exp.isFarming ? '🌾 Farming' : '🛒 Daily'} {exp.quantityUsed && `• ${exp.quantityUsed}`}
+                    </p>
+                  </div>
                   <span className="text-xs font-bold text-neutral-900">
-                    ₹{gift.amountOrValue.toLocaleString('en-IN')}
+                    ₹{exp.amount.toLocaleString('en-IN')}
                   </span>
-                  <p className="text-[10px] text-neutral-500">{gift.giftCategory}</p>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* Latest Gifts / Shagun */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500 flex items-center justify-between">
+                <span>{state.language === 'hi' ? 'नवीनतम शगुन प्रविष्टियां' : 'Latest Shagun Records'}</span>
+                <span className="text-neutral-400 font-normal">🎁</span>
+              </h3>
+              {state.gifts.slice(0, 3).map((gift) => (
+                <div key={gift.id} className="p-3 bg-neutral-50 rounded-xl border border-neutral-200/70 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-semibold text-neutral-900">
+                      {gift.personName}
+                    </p>
+                    <p className="text-[11px] text-neutral-500">
+                      {gift.occasion} • {gift.type === 'received' ? '📥 Recv' : '📤 Given'}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs font-bold text-neutral-900">
+                      ₹{gift.amountOrValue.toLocaleString('en-IN')}
+                    </span>
+                    <p className="text-[10px] text-neutral-500">{gift.giftCategory}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

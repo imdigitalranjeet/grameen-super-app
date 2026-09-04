@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, ShieldCheck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, ShieldCheck, Sparkles } from 'lucide-react';
 import { Language, PlantationCrop, SprayLog } from '../../types';
 import { translations } from '../../utils/translations';
 import { VoiceInputButton } from '../VoiceInputButton';
@@ -9,6 +9,7 @@ interface AddSprayModalProps {
   onClose: () => void;
   crops: PlantationCrop[];
   selectedCropId?: string;
+  initialData?: Partial<SprayLog>;
   onSave: (cropId: string, log: Omit<SprayLog, 'id'>, alsoRecordExpense: boolean) => void;
   language: Language;
 }
@@ -18,6 +19,7 @@ export const AddSprayModal: React.FC<AddSprayModalProps> = ({
   onClose,
   crops,
   selectedCropId,
+  initialData,
   onSave,
   language,
 }) => {
@@ -29,6 +31,23 @@ export const AddSprayModal: React.FC<AddSprayModalProps> = ({
   const [cost, setCost] = useState('450');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [alsoRecordExpense, setAlsoRecordExpense] = useState(true);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (selectedCropId) {
+        setCropId(selectedCropId);
+      } else if (crops.length > 0 && !cropId) {
+        setCropId(crops[0].id);
+      }
+
+      if (initialData) {
+        if (initialData.name) setName(initialData.name);
+        if (initialData.purpose) setPurpose(initialData.purpose);
+        if (initialData.cost !== undefined) setCost(String(initialData.cost));
+        if (initialData.date) setDate(initialData.date);
+      }
+    }
+  }, [isOpen, initialData, selectedCropId]);
 
   if (!isOpen) return null;
 
@@ -66,6 +85,17 @@ export const AddSprayModal: React.FC<AddSprayModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {initialData?.name && (
+            <div className="flex items-center gap-2 p-3 bg-purple-50 border border-purple-200 rounded-xl text-xs text-purple-900 font-medium">
+              <Sparkles className="w-4 h-4 text-purple-600 shrink-0" />
+              <span>
+                {language === 'hi'
+                  ? '✨ कैमरा लेबल स्कैनर द्वारा जानकारी स्वतः भर दी गई है। आवश्यकतानुसार जांच लें।'
+                  : '✨ Details auto-filled from Camera Label Scanner. Review or edit before saving.'}
+              </span>
+            </div>
+          )}
+
           <div>
             <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
               {language === 'hi' ? 'खेत व फसल चुनें' : 'Select Field / Crop'} *

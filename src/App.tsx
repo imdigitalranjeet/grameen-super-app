@@ -29,6 +29,7 @@ import { AddReminderModal } from './components/modals/AddReminderModal';
 import { AddGiftModal } from './components/modals/AddGiftModal';
 import { AddBahiKhataModal } from './components/modals/AddBahiKhataModal';
 import { BackupRestoreModal } from './components/modals/BackupRestoreModal';
+import { LabelScannerModal, ScannedFertilizerData, ScannedSprayData } from './components/modals/LabelScannerModal';
 
 export default function App() {
   // Global State initialized from localStorage or initial dummy village data
@@ -48,6 +49,12 @@ export default function App() {
   const [isAddGiftOpen, setIsAddGiftOpen] = useState(false);
   const [isAddBahiKhataOpen, setIsAddBahiKhataOpen] = useState(false);
   const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
+
+  // Label Scanner & Auto-Fill States
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [scannerTargetCropId, setScannerTargetCropId] = useState<string | undefined>(undefined);
+  const [prefilledFertilizerData, setPrefilledFertilizerData] = useState<any>(undefined);
+  const [prefilledSprayData, setPrefilledSprayData] = useState<any>(undefined);
 
   // Sync to localStorage on changes
   useEffect(() => {
@@ -212,6 +219,24 @@ export default function App() {
     }));
   };
 
+  // LABEL SCANNER & AUTO-FILL HANDLERS
+  const handleOpenScanner = (cropId?: string) => {
+    setScannerTargetCropId(cropId);
+    setIsScannerOpen(true);
+  };
+
+  const handleAutoFillFertilizer = (cropId: string, data: ScannedFertilizerData) => {
+    setFertilizerTargetCropId(cropId);
+    setPrefilledFertilizerData(data);
+    setIsAddFertilizerOpen(true);
+  };
+
+  const handleAutoFillSpray = (cropId: string, data: ScannedSprayData) => {
+    setSprayTargetCropId(cropId);
+    setPrefilledSprayData(data);
+    setIsAddSprayOpen(true);
+  };
+
   // 3. REMINDER HANDLERS
   const handleSaveReminder = (newRem: Omit<ReminderItem, 'id' | 'completed'>) => {
     const item: ReminderItem = {
@@ -365,6 +390,7 @@ export default function App() {
             onAskAiForCrop={(crop) => {
               setActiveTab('tools');
             }}
+            onOpenScanner={handleOpenScanner}
             language={state.language}
           />
         )}
@@ -453,9 +479,11 @@ export default function App() {
         onClose={() => {
           setIsAddFertilizerOpen(false);
           setFertilizerTargetCropId(undefined);
+          setPrefilledFertilizerData(undefined);
         }}
         crops={state.crops}
         selectedCropId={fertilizerTargetCropId}
+        initialData={prefilledFertilizerData}
         onSave={handleSaveFertilizerLog}
         language={state.language}
       />
@@ -466,9 +494,11 @@ export default function App() {
         onClose={() => {
           setIsAddSprayOpen(false);
           setSprayTargetCropId(undefined);
+          setPrefilledSprayData(undefined);
         }}
         crops={state.crops}
         selectedCropId={sprayTargetCropId}
+        initialData={prefilledSprayData}
         onSave={handleSaveSprayLog}
         language={state.language}
       />
@@ -518,6 +548,20 @@ export default function App() {
         state={state}
         onRestore={handleRestoreState}
         onResetDemo={handleResetDemoData}
+        language={state.language}
+      />
+
+      {/* 10. AI Smart Camera Label Scanner Modal */}
+      <LabelScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => {
+          setIsScannerOpen(false);
+          setScannerTargetCropId(undefined);
+        }}
+        crops={state.crops}
+        selectedCropId={scannerTargetCropId}
+        onAutoFillFertilizer={handleAutoFillFertilizer}
+        onAutoFillSpray={handleAutoFillSpray}
         language={state.language}
       />
     </div>

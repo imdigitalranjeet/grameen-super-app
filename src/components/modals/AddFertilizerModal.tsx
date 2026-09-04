@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, FlaskConical } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, FlaskConical, Sparkles } from 'lucide-react';
 import { FertilizerLog, Language, PlantationCrop } from '../../types';
 import { translations } from '../../utils/translations';
 import { VoiceInputButton } from '../VoiceInputButton';
@@ -9,6 +9,7 @@ interface AddFertilizerModalProps {
   onClose: () => void;
   crops: PlantationCrop[];
   selectedCropId?: string;
+  initialData?: Partial<FertilizerLog>;
   onSave: (cropId: string, log: Omit<FertilizerLog, 'id'>, createExpenseEntry: boolean) => void;
   language: Language;
 }
@@ -18,6 +19,7 @@ export const AddFertilizerModal: React.FC<AddFertilizerModalProps> = ({
   onClose,
   crops,
   selectedCropId,
+  initialData,
   onSave,
   language,
 }) => {
@@ -33,6 +35,27 @@ export const AddFertilizerModal: React.FC<AddFertilizerModalProps> = ({
   const [stage, setStage] = useState('Top Dressing');
   const [notes, setNotes] = useState('');
   const [alsoRecordExpense, setAlsoRecordExpense] = useState(true);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (selectedCropId) {
+        setCropId(selectedCropId);
+      } else if (crops.length > 0 && !cropId) {
+        setCropId(crops[0].id);
+      }
+
+      if (initialData) {
+        if (initialData.fertilizerType) setFertilizerType(initialData.fertilizerType);
+        if (initialData.quantity !== undefined) setQuantity(String(initialData.quantity));
+        if (initialData.unit) setUnit(initialData.unit);
+        if (initialData.cost !== undefined) setCost(String(initialData.cost));
+        if (initialData.date) setDate(initialData.date);
+        if (initialData.applicationMethod) setApplicationMethod(initialData.applicationMethod);
+        if (initialData.stage) setStage(initialData.stage);
+        if (initialData.notes !== undefined) setNotes(initialData.notes);
+      }
+    }
+  }, [isOpen, initialData, selectedCropId]);
 
   if (!isOpen) return null;
 
@@ -74,6 +97,17 @@ export const AddFertilizerModal: React.FC<AddFertilizerModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {initialData?.fertilizerType && (
+            <div className="flex items-center gap-2 p-3 bg-purple-50 border border-purple-200 rounded-xl text-xs text-purple-900 font-medium">
+              <Sparkles className="w-4 h-4 text-purple-600 shrink-0" />
+              <span>
+                {language === 'hi'
+                  ? '✨ कैमरा लेबल स्कैनर द्वारा जानकारी स्वतः भर दी गई है। आवश्यकतानुसार जांच लें।'
+                  : '✨ Details auto-filled from Camera Label Scanner. Review or edit before saving.'}
+              </span>
+            </div>
+          )}
+
           {/* Select Target Crop / Plot */}
           <div>
             <label className="block text-xs font-semibold text-neutral-700 mb-1.5">

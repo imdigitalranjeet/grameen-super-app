@@ -254,7 +254,7 @@ export const INITIAL_STATE: VillageSuperAppState = {
       variety: 'Kufri Pukhraj + Early Snowball',
       plantingDate: '2026-06-15',
       expectedHarvestDate: '2026-09-15',
-      status: 'harvest_ready',
+      status: 'harvested',
       notes: 'Drip irrigated; exceptional tuber development.',
       fertilizerLogs: [
         {

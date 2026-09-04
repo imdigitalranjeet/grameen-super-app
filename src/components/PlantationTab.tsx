@@ -13,10 +13,13 @@ import {
   ChevronDown,
   ChevronUp,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Calculator,
+  Camera
 } from 'lucide-react';
 import { Language, PlantationCrop } from '../types';
 import { translations } from '../utils/translations';
+import { CropProfitLossModal } from './modals/CropProfitLossModal';
 
 interface PlantationTabProps {
   crops: PlantationCrop[];
@@ -26,6 +29,7 @@ interface PlantationTabProps {
   onAddHarvest: (cropId: string) => void;
   onDeleteCrop: (id: string) => void;
   onAskAiForCrop: (crop: PlantationCrop) => void;
+  onOpenScanner: (cropId?: string) => void;
   language: Language;
 }
 
@@ -37,10 +41,14 @@ export const PlantationTab: React.FC<PlantationTabProps> = ({
   onAddHarvest,
   onDeleteCrop,
   onAskAiForCrop,
+  onOpenScanner,
   language,
 }) => {
   const t = translations[language];
   const [expandedCropId, setExpandedCropId] = useState<string | null>(crops[0]?.id || null);
+  const [summaryModalCropId, setSummaryModalCropId] = useState<string | null>(null);
+
+  const selectedSummaryCrop = crops.find((c) => c.id === summaryModalCropId) || null;
 
   const getStatusBadge = (status: PlantationCrop['status']) => {
     switch (status) {
@@ -70,15 +78,43 @@ export const PlantationTab: React.FC<PlantationTabProps> = ({
           </p>
         </div>
 
-        <button
-          id="add-crop-plot-main-btn"
-          type="button"
-          onClick={onAddCrop}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer self-start sm:self-auto"
-        >
-          <PlusCircle className="w-4 h-4 text-emerald-200" />
-          <span>{t.plantation.addNewPlot}</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <button
+            id="scan-label-main-header-btn"
+            type="button"
+            onClick={() => onOpenScanner()}
+            className="inline-flex items-center gap-2 px-3.5 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            title={language === 'hi' ? 'कैमरा से खाद या कीटनाशक का लेबल स्कैन करें' : 'Scan fertilizer or pesticide label with camera'}
+          >
+            <Camera className="w-4 h-4 text-purple-200" />
+            <span>{language === 'hi' ? 'लेबल स्कैन (AI Camera)' : 'Scan Label (AI Camera)'}</span>
+          </button>
+
+          {crops.length > 0 && (
+            <button
+              id="open-harvest-summary-main-btn"
+              type="button"
+              onClick={() => {
+                const targetCrop = crops.find((c) => c.harvestRecords.length > 0) || crops[0];
+                if (targetCrop) setSummaryModalCropId(targetCrop.id);
+              }}
+              className="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+            >
+              <Calculator className="w-4 h-4 text-emerald-700" />
+              <span>{language === 'hi' ? 'फसल लाभ-हानि रिपोर्ट (P&L)' : 'Crop P&L Summary'}</span>
+            </button>
+          )}
+
+          <button
+            id="add-crop-plot-main-btn"
+            type="button"
+            onClick={onAddCrop}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+          >
+            <PlusCircle className="w-4 h-4 text-emerald-200" />
+            <span>{t.plantation.addNewPlot}</span>
+          </button>
+        </div>
       </div>
 
       {/* Crops List */}
@@ -87,9 +123,12 @@ export const PlantationTab: React.FC<PlantationTabProps> = ({
           const isExpanded = expandedCropId === crop.id;
           const statusInfo = getStatusBadge(crop.status);
 
-          // Calculate total fertilizer quantity applied
+          // Calculate total fertilizer and spray expenses and total harvest revenue
           const totalFertilizerCost = crop.fertilizerLogs.reduce((sum, f) => sum + (f.cost || 0), 0);
+          const totalSprayCost = crop.sprayLogs.reduce((sum, s) => sum + (s.cost || 0), 0);
+          const totalInputCost = totalFertilizerCost + totalSprayCost;
           const totalHarvestRevenue = crop.harvestRecords.reduce((sum, h) => sum + h.totalRevenue, 0);
+          const netProfitLoss = totalHarvestRevenue - totalInputCost;
 
           return (
             <div
@@ -133,12 +172,41 @@ export const PlantationTab: React.FC<PlantationTabProps> = ({
 
                 <div className="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 pt-2 sm:pt-0 border-neutral-100">
                   <div className="text-left sm:text-right">
-                    <span className="text-xs font-bold text-emerald-950 block">
-                      🧪 {crop.fertilizerLogs.length} {language === 'hi' ? 'खाद चक्र' : 'Fertilizer Doses'}
-                    </span>
-                    <span className="text-[11px] text-neutral-500">
-                      ₹{totalFertilizerCost.toLocaleString('en-IN')} {language === 'hi' ? 'खाद लागत' : 'Fert. Cost'}
-                    </span>
+                    {crop.harvestRecords.length > 0 ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSummaryModalCropId(crop.id);
+                        }}
+                        className={`p-2 rounded-xl border text-left sm:text-right transition-all cursor-pointer hover:shadow-xs ${
+                          netProfitLoss >= 0
+                            ? 'bg-emerald-50 border-emerald-300 text-emerald-950 hover:bg-emerald-100/80'
+                            : 'bg-rose-50 border-rose-300 text-rose-950 hover:bg-rose-100/80'
+                        }`}
+                        title={language === 'hi' ? 'लाभ/हानि रिपोर्ट देखने के लिए क्लिक करें' : 'Click to view Profit/Loss statement'}
+                      >
+                        <div className="flex items-center gap-1 sm:justify-end">
+                          <Calculator className="w-3.5 h-3.5 text-emerald-700" />
+                          <span className="text-xs font-bold">
+                            {netProfitLoss >= 0 ? '+' : '-'}₹{Math.abs(netProfitLoss).toLocaleString('en-IN')}{' '}
+                            {language === 'hi' ? (netProfitLoss >= 0 ? 'शुद्ध लाभ' : 'शुद्ध घाटा') : (netProfitLoss >= 0 ? 'Net Profit' : 'Net Loss')}
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-neutral-600 block mt-0.5">
+                          ₹{totalHarvestRevenue.toLocaleString('en-IN')} {language === 'hi' ? 'आय' : 'Rev'} - ₹{totalInputCost.toLocaleString('en-IN')} {language === 'hi' ? 'लागत' : 'Cost'}
+                        </span>
+                      </button>
+                    ) : (
+                      <>
+                        <span className="text-xs font-bold text-emerald-950 block">
+                          🧪 {crop.fertilizerLogs.length} {language === 'hi' ? 'खाद चक्र' : 'Fertilizer Doses'}
+                        </span>
+                        <span className="text-[11px] text-neutral-500">
+                          ₹{totalFertilizerCost.toLocaleString('en-IN')} {language === 'hi' ? 'खाद' : 'Fert'} • ₹{totalSprayCost.toLocaleString('en-IN')} {language === 'hi' ? 'स्प्रे' : 'Spray'}
+                        </span>
+                      </>
+                    )}
                   </div>
 
                   <div className="p-1 rounded-lg text-neutral-400 hover:text-neutral-700">
@@ -153,9 +221,20 @@ export const PlantationTab: React.FC<PlantationTabProps> = ({
                   {/* Action Buttons for this crop */}
                   <div className="flex flex-wrap items-center gap-2 pt-2">
                     <button
+                      id={`crop-scan-label-btn-${crop.id}`}
+                      type="button"
+                      onClick={() => onOpenScanner(crop.id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+                      title={language === 'hi' ? 'इस खेत के लिए खाद/दवा का लेबल स्कैन करें' : 'Scan fertilizer or spray label for this crop'}
+                    >
+                      <Camera className="w-3.5 h-3.5 text-purple-200" />
+                      <span>{language === 'hi' ? 'लेबल स्कैन' : 'Scan Label'}</span>
+                    </button>
+
+                    <button
                       type="button"
                       onClick={() => onAddFertilizer(crop.id)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-semibold shadow-2xs transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
                     >
                       <FlaskConical className="w-3.5 h-3.5 text-emerald-200" />
                       <span>{t.plantation.addFertilizer}</span>
@@ -164,7 +243,7 @@ export const PlantationTab: React.FC<PlantationTabProps> = ({
                     <button
                       type="button"
                       onClick={() => onAddSpray(crop.id)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 rounded-xl text-xs font-semibold transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
                     >
                       <ShieldCheck className="w-3.5 h-3.5 text-purple-700" />
                       <span>{t.plantation.addSpray}</span>
@@ -173,16 +252,27 @@ export const PlantationTab: React.FC<PlantationTabProps> = ({
                     <button
                       type="button"
                       onClick={() => onAddHarvest(crop.id)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 rounded-xl text-xs font-semibold transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-100 text-neutral-800 border border-neutral-300 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
                     >
                       <TrendingUp className="w-3.5 h-3.5 text-amber-700" />
                       <span>{t.plantation.addHarvest}</span>
                     </button>
 
                     <button
+                      id={`crop-pnl-summary-btn-${crop.id}`}
+                      type="button"
+                      onClick={() => setSummaryModalCropId(crop.id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+                      title={language === 'hi' ? 'लाभ व हानि सारांश' : 'Profit & Loss Summary'}
+                    >
+                      <Calculator className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>{language === 'hi' ? 'मुनाफ़ा / नुकसान विवरण' : 'Profit/Loss Summary'}</span>
+                    </button>
+
+                    <button
                       type="button"
                       onClick={() => onAskAiForCrop(crop)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-xl text-xs font-semibold transition-colors"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                       <span>{language === 'hi' ? 'फसल की सलाह (AI Advice)' : 'Get AI Advisory'}</span>
@@ -289,14 +379,24 @@ export const PlantationTab: React.FC<PlantationTabProps> = ({
                   {/* 3. Harvest & Sale Revenue Records Sub-section */}
                   {crop.harvestRecords.length > 0 && (
                     <div className="space-y-2 pt-2 border-t border-neutral-200/60">
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
                         <h3 className="text-xs font-bold uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
                           <TrendingUp className="w-3.5 h-3.5 text-amber-700" />
                           <span>{t.plantation.harvestRecords}</span>
                         </h3>
-                        <span className="text-xs font-bold text-emerald-950">
-                          {language === 'hi' ? 'कुल बिक्री आय:' : 'Total Harvest Revenue:'} ₹{totalHarvestRevenue.toLocaleString('en-IN')}
-                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs font-bold text-emerald-950">
+                            {language === 'hi' ? 'कुल बिक्री आय:' : 'Total Harvest Revenue:'} ₹{totalHarvestRevenue.toLocaleString('en-IN')}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setSummaryModalCropId(crop.id)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold bg-amber-100 hover:bg-amber-200 text-amber-950 border border-amber-300 rounded-lg transition-colors cursor-pointer"
+                          >
+                            <Calculator className="w-3.5 h-3.5 text-amber-800" />
+                            <span>{language === 'hi' ? 'विस्तृत P&L रिपोर्ट' : 'View P&L Report'}</span>
+                          </button>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
@@ -348,6 +448,17 @@ export const PlantationTab: React.FC<PlantationTabProps> = ({
           </div>
         )}
       </div>
+
+      {/* Crop Profit & Loss Summary Modal */}
+      <CropProfitLossModal
+        isOpen={selectedSummaryCrop !== null}
+        onClose={() => setSummaryModalCropId(null)}
+        crop={selectedSummaryCrop}
+        crops={crops}
+        onSelectCrop={(cropId) => setSummaryModalCropId(cropId)}
+        onAddHarvest={(cropId) => onAddHarvest(cropId)}
+        language={language}
+      />
     </div>
   );
 };

@@ -17,6 +17,7 @@ import { ExpenseCategory, ExpenseItem, Language, PlantationCrop } from '../types
 import { translations } from '../utils/translations';
 import { exportExpensesToCSV } from '../utils/storage';
 import { VoiceInputButton } from './VoiceInputButton';
+import { ExpenseCategoryPieChart } from './ExpenseCategoryPieChart';
 
 interface ExpensesTabProps {
   expenses: ExpenseItem[];
@@ -38,9 +39,19 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
   const t = translations[language];
 
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [selectedCategory, setSelectedCategory] = useState<ExpenseCategory | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCrop, setSelectedCrop] = useState<string>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
+
+  // Expenses for the Pie Chart visualization (reflects selected crop/plot or month if filtered)
+  const expensesForChart = useMemo(() => {
+    return expenses.filter((e) => {
+      if (selectedCrop !== 'all' && e.cropOrPlot !== selectedCrop) return false;
+      if (selectedMonth !== 'all' && !e.date.startsWith(selectedMonth)) return false;
+      return true;
+    });
+  }, [expenses, selectedCrop, selectedMonth]);
 
   // Unique months from data
   const months = useMemo(() => {
@@ -56,6 +67,9 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
   // Filtered Expenses
   const filteredExpenses = useMemo(() => {
     return expenses.filter((e) => {
+      // Category Specific Filter from Pie Chart or Selector
+      if (selectedCategory !== 'all' && e.category !== selectedCategory) return false;
+
       // Type Filter
       if (activeFilter === 'farming' && !e.isFarming) return false;
       if (activeFilter === 'daily' && e.isFarming) return false;
@@ -197,8 +211,40 @@ export const ExpensesTab: React.FC<ExpensesTabProps> = ({
         </div>
       </div>
 
+      {/* Category Breakdown Visualization using Recharts */}
+      <ExpenseCategoryPieChart
+        expenses={expensesForChart}
+        language={language}
+        onSelectCategory={(cat) => {
+          setSelectedCategory((prev) => (prev === cat ? 'all' : (cat || 'all')));
+        }}
+        selectedCategoryFilter={selectedCategory === 'all' ? null : selectedCategory}
+      />
+
       {/* Filters & Search Control Bar */}
       <div className="p-4 bg-white border border-neutral-200 rounded-2xl shadow-2xs space-y-3">
+        {selectedCategory !== 'all' && (
+          <div className="flex items-center justify-between p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900">
+            <div className="flex items-center gap-2">
+              <Filter className="w-3.5 h-3.5 text-emerald-700" />
+              <span>
+                {language === 'hi' ? 'पाई चार्ट फ़िल्टर:' : 'Category Filter:'}{' '}
+                <strong className="text-emerald-950 font-bold">
+                  {t.expenses.categories[selectedCategory] || selectedCategory}
+                </strong>{' '}
+                ({filteredExpenses.length} {language === 'hi' ? 'प्रविष्टियां' : 'records'})
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedCategory('all')}
+              className="text-xs font-bold text-emerald-800 hover:text-emerald-950 underline px-2 py-0.5 rounded cursor-pointer"
+            >
+              {language === 'hi' ? 'फ़िल्टर हटाएं (सभी श्रेणियां देखें)' : 'Show All Categories'}
+            </button>
+          </div>
+        )}
+
         {/* Filter Tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
           {[

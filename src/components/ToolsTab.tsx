@@ -141,7 +141,7 @@ export const ToolsTab: React.FC<ToolsTabProps> = ({
       });
 
       const data = await response.json();
-      const reply = data.advice || (language === 'hi' ? 'सर्वर से उत्तर प्राप्त नहीं हो सका।' : 'Unable to retrieve answer.');
+      const reply = data.reply || data.advice || (language === 'hi' ? 'सर्वर से उत्तर प्राप्त नहीं हो सका।' : 'Unable to retrieve answer.');
 
       setAiConversation((prev) => [
         ...prev,
@@ -566,13 +566,14 @@ export const ToolsTab: React.FC<ToolsTabProps> = ({
             {state.bahiKhata.map((item) => {
               const isTook = item.type === 'you_took';
 
-              // WhatsApp Reminder Generator URL
+              // WhatsApp Reminder Generator URL with phone digits sanitization
+              const cleanPhone = (item.phone || '').replace(/[^0-9]/g, '');
               const waText = encodeURIComponent(
                 language === 'hi'
                   ? `नमस्ते ${item.personName} जी, बही-खाता के अनुसार ₹${item.amount} का बकाया हिसाब है। विवरण: ${item.purpose}। कृपया चेक करें।`
                   : `Hello ${item.personName}, this is a gentle reminder regarding ₹${item.amount} credit record (${item.purpose}). Thank you.`
               );
-              const waUrl = item.phone ? `https://wa.me/91${item.phone}?text=${waText}` : null;
+              const waUrl = cleanPhone.length >= 10 ? `https://wa.me/91${cleanPhone}?text=${waText}` : null;
 
               return (
                 <div
@@ -636,7 +637,7 @@ export const ToolsTab: React.FC<ToolsTabProps> = ({
                       <a
                         href={waUrl}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
                         className="p-2 text-emerald-800 bg-emerald-100 hover:bg-emerald-200 rounded-lg transition-colors"
                         title={language === 'hi' ? 'WhatsApp पर याद दिलाएं' : 'Share on WhatsApp'}
                       >

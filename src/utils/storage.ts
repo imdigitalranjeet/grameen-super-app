@@ -52,19 +52,29 @@ export function exportStateToJson(state: VillageSuperAppState): void {
   URL.revokeObjectURL(url);
 }
 
+function safeCsvCell(val: any): string {
+  if (val === null || val === undefined) return '""';
+  let str = String(val);
+  // Prevent CSV Formula Injection (DDE injection in Excel/Sheets)
+  if (/^[=+\-@\t\r]/.test(str)) {
+    str = "'" + str;
+  }
+  return `"${str.replace(/"/g, '""')}"`;
+}
+
 export function exportExpensesToCSV(expenses: ExpenseItem[]): void {
   const headers = ['ID', 'Title', 'Category', 'Amount (INR)', 'Date', 'Type', 'Payment Mode', 'Quantity/Details', 'Crop/Field', 'Notes'];
   const rows = (expenses || []).map(e => [
-    `"${e.id}"`,
-    `"${(e.title || '').replace(/"/g, '""')}"`,
-    `"${e.category}"`,
-    e.amount,
-    `"${e.date}"`,
+    safeCsvCell(e.id),
+    safeCsvCell(e.title),
+    safeCsvCell(e.category),
+    Number(e.amount) || 0,
+    safeCsvCell(e.date),
     e.isFarming ? '"Farming"' : '"Daily Living"',
-    `"${e.paymentMode}"`,
-    `"${(e.quantityUsed || '').replace(/"/g, '""')}"`,
-    `"${(e.cropOrPlot || '').replace(/"/g, '""')}"`,
-    `"${(e.notes || '').replace(/"/g, '""')}"`
+    safeCsvCell(e.paymentMode),
+    safeCsvCell(e.quantityUsed),
+    safeCsvCell(e.cropOrPlot),
+    safeCsvCell(e.notes)
   ]);
 
   const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
@@ -80,17 +90,17 @@ export function exportExpensesToCSV(expenses: ExpenseItem[]): void {
 export function exportGiftsToCSV(gifts: GiftItem[]): void {
   const headers = ['ID', 'Type', 'Person Name', 'Village / Relation', 'Occasion', 'Date', 'Category', 'Amount / Value (INR)', 'Description', 'Return Settled', 'Counter Details'];
   const rows = (gifts || []).map(g => [
-    `"${g.id}"`,
-    `"${g.type === 'received' ? 'Received (Aaya)' : 'Given (Diya)'}"`,
-    `"${(g.personName || '').replace(/"/g, '""')}"`,
-    `"${(g.villageOrRelation || '').replace(/"/g, '""')}"`,
-    `"${(g.occasion || '').replace(/"/g, '""')}"`,
-    `"${g.date}"`,
-    `"${g.giftCategory}"`,
-    g.amountOrValue,
-    `"${(g.itemDescription || '').replace(/"/g, '""')}"`,
+    safeCsvCell(g.id),
+    safeCsvCell(g.type === 'received' ? 'Received (Aaya)' : 'Given (Diya)'),
+    safeCsvCell(g.personName),
+    safeCsvCell(g.villageOrRelation),
+    safeCsvCell(g.occasion),
+    safeCsvCell(g.date),
+    safeCsvCell(g.giftCategory),
+    Number(g.amountOrValue) || 0,
+    safeCsvCell(g.itemDescription),
     g.counterGiftSettled ? '"Yes"' : '"No"',
-    `"${(g.counterGiftDetails || '').replace(/"/g, '""')}"`
+    safeCsvCell(g.counterGiftDetails)
   ]);
 
   const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');

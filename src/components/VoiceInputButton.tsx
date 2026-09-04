@@ -29,11 +29,7 @@ export const VoiceInputButton: React.FC<VoiceInputButtonProps> = ({
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      alert(
-        language === 'hi'
-          ? 'आपका ब्राउज़र वॉयस इनपुट को सपोर्ट नहीं करता। कृपया टेक्स्ट टाइप करें।'
-          : 'Your browser does not support voice input. Please type text.'
-      );
+      setSupported(false);
       return;
     }
 

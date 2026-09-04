@@ -155,6 +155,38 @@ export interface MandiPrice {
   lastUpdated: string;
 }
 
+export interface WeatherGroundingSource {
+  title: string;
+  uri: string;
+}
+
+export interface DayForecast {
+  day: string;
+  date: string;
+  condition: string;
+  tempMax: number;
+  tempMin: number;
+  rainProb: string | number;
+  humidity?: string;
+  wind?: string;
+  farmAdvice: string;
+  suitability?: {
+    spraying?: 'favorable' | 'caution' | 'unfavorable';
+    irrigation?: 'recommended' | 'not_needed' | 'pause';
+    harvesting?: 'good' | 'risky';
+  };
+}
+
+export interface WeatherForecastData {
+  location: string;
+  asOf: string;
+  overview: string;
+  farmPlanningSummary: string;
+  forecast: DayForecast[];
+  sources?: WeatherGroundingSource[];
+  isFallback?: boolean;
+}
+
 export interface VillageSuperAppState {
   expenses: ExpenseItem[];
   crops: PlantationCrop[];
@@ -165,3 +197,4 @@ export interface VillageSuperAppState {
   currency: string;
   language: Language;
 }
+
