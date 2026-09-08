@@ -1,12 +1,12 @@
-# 🌾 Gramin: Village Super App (ग्रामीण सुपर ऐप)
+# 🌾 Gramin: Village Super App (ग्रामीण सुपर ऐप) - Android
 
-> An all-in-one digital companion designed specifically for Indian rural households and farming communities. Manage agricultural & household expenses, monitor crop lifecycles, maintain the traditional Shagun/Bahi-Khata ledger, track critical village reminders, and access live 7-day weather forecasts grounded by Google Search.
+> An all-in-one native Android application designed specifically for Indian rural households and farming communities. Built with modern Kotlin, Jetpack Compose, Material Design 3, and Room local database persistence. Manage agricultural & household expenses, monitor crop lifecycles & fertilizer logs, maintain the traditional Shagun/Bahi-Khata ledger, track critical village reminders, and access live agricultural tools.
 
-[![React](https://img.shields.io/badge/React-18.x-61DAFB?logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38B2AC?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Recharts](https://img.shields.io/badge/Recharts-2.x-22c55e)](https://recharts.org/)
-[![Google Gemini API](https://img.shields.io/badge/Google_Gemini_API-3.8_Flash-4285F4?logo=google&logoColor=white)](https://ai.google.dev/)
+[![Platform](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)](https://www.android.com/)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.1.0-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org/)
+[![Jetpack Compose](https://img.shields.io/badge/Jetpack_Compose-BOM_2025.02.00-4285F4?logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
+[![Material 3](https://img.shields.io/badge/Material_Design-3-1B73E8)](https://m3.material.io/)
+[![Room](https://img.shields.io/badge/Room_Database-2.6.1-F4B400)](https://developer.android.com/training/data-storage/room)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
@@ -15,206 +15,114 @@
 
 - [Overview](#-overview)
 - [Key Features](#-key-features)
-  - [1. 7-Day Agricultural Weather Forecast (Google Search Grounded)](#1-7-day-agricultural-weather-forecast-google-search-grounded)
-  - [2. Expenses & Farm Economics Tracker (हिसाब-किताब)](#2-expenses--farm-economics-tracker-हिसाब-किताब)
+  - [1. Overview Dashboard](#1-overview-dashboard)
+  - [2. Expenses Tracker (हिसाब-किताब)](#2-expenses-tracker-हिसाब-किताब)
   - [3. Crop Lifecycle & Plantation Management (फसल चक्र)](#3-crop-lifecycle--plantation-management-फसल-चक्र)
-  - [4. Shagun & Bahi-Khata Ceremony Ledger (शगुन व न्योता)](#4-shagun--bahi-khata-ceremony-ledger-शगुन-व-न्योता)
-  - [5. Village Reminders & Task Alarms (याद दिलाना)](#5-village-reminders--task-alarms-याद-दिलाना)
-  - [6. Kisan AI Agronomy Advisor & Tools (किसान सहायक)](#6-kisan-ai-agronomy-advisor--tools-किसान-सहायक)
-  - [7. Bilingual & Offline-Ready Data Management](#7-bilingual--offline-ready-data-management)
+  - [4. Smart Village Reminders (याद दिलाना)](#4-smart-village-reminders-याद-दिलाना)
+  - [5. Shagun & Neota Registry (शगुन बही)](#5-shagun--neota-registry-शगुन-बही)
+  - [6. Village Bahi-Khata (उधार-जमा लेजर)](#6-village-bahi-khata-उधार-जमा-लेजर)
+  - [7. Agronomy Tools & Live Mandi Rates](#7-agronomy-tools--live-mandi-rates)
 - [Architecture & Tech Stack](#-architecture--tech-stack)
 - [Project Directory Structure](#-project-directory-structure)
-- [Getting Started](#-getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Environment Configuration](#environment-configuration)
-  - [Development Server](#development-server)
-  - [Production Build](#production-build)
-- [API Endpoints](#-api-endpoints)
-- [Design & Accessibility Principles](#-design--accessibility-principles)
-- [Contributing](#-contributing)
-- [License](#-license)
+- [Building the Project](#-building-the-project)
 
 ---
 
 ## 🌟 Overview
 
-Rural families and farmers often juggle diverse financial and operational streams—from agricultural inputs (fertilizers, diesel, seeds, labor wages) to household grocery bills, crop harvest schedules, government loan deadlines, and cultural occasion gifts (shagun/nyota). Traditionally, these records are either scattered across pocket paper notebooks (*Bahi-Khata*) or forgotten.
+Rural families and farmers often juggle diverse financial and operational streams—from agricultural inputs (fertilizers, diesel, seeds, labor wages) to household grocery bills, crop harvest schedules, government loan deadlines, and cultural occasion gifts (shagun/nyota). 
 
-**Gramin** unifies these daily village needs into a single, intuitive, bilingual (Hindi/English) web application with voice input, real-time visual analytics, and live meteorological insights tailored for field planning.
+**Gramin: Village Super App** brings these essential records into a unified, native Android application crafted with Jetpack Compose. With local offline-first Room database storage, bilingual (Hindi/English) interface, and scientific agricultural calculators, it serves as a trusted companion for every rural household.
 
 ---
 
 ## 🚀 Key Features
 
-### 1. 7-Day Agricultural Weather Forecast (Google Search Grounded)
-- **Live Search Grounding**: Fetches up-to-date meteorological data via Google Gemini 3.8 Flash grounded with Google Search, complete with verified source citations.
-- **Agronomic Operation Suitability Windows**: Provides day-by-day actionability ratings for:
-  - 🧪 **Spraying**: Evaluates rain wash-off risks and wind speeds before applying pesticides or foliar nutrients.
-  - 💧 **Irrigation**: Guides farmers on whether to run tubewell/canal pumps or pause to conserve electricity and avoid waterlogging.
-  - 🌾 **Harvesting & Threshing**: Identifies safe, sunny windows for field harvesting and crop drying.
-- **Location Detection & Presets**: Includes one-click GPS geolocation detection, search by village/district, and regional presets (Indore, Karnal, Nashik, Varanasi, Ludhiana).
-- **Resilient Caching**: Features server-side in-memory caching to optimize response times and prevent API quota exhaustion.
+### 1. Overview Dashboard
+- Quick metric summary: Total spend, active plot acreage, due reminders count, and pending ledger balance.
+- Agricultural weather advisory card with spraying and irrigation suitability indicators.
+- One-tap quick actions to add expenses, plantation crops, reminders, or bahi-khata ledger entries.
 
-### 2. Expenses & Farm Economics Tracker (हिसाब-किताब)
-- **Granular Categories**: Differentiates between **Farming** (*Fertilizer, Labor, Seeds, Pesticides, Diesel/Tractor, Irrigation, Livestock Fodder*) and **Daily Living** (*Groceries, Household, Medical, Education, Electricity Bills*).
-- **Interactive Recharts Donut Pie Chart**:
-  - Live proportion breakdown by category with rupee amounts and percentage shares.
-  - Dynamic center summary displaying category totals on hover.
-  - Quick-scope toggle: **All Expenses**, **Farming Only (🌾)**, and **Household Only (🛒)**.
-  - Single-click interactive slice drill-down to filter expense lists.
-- **Voice Input**: Integrated speech recognition for hands-free expense entry in Hindi and English.
-- **Export**: Instant CSV export for offline records, bank submissions, or tax purposes.
+### 2. Expenses Tracker (हिसाब-किताब)
+- Filter by All Expenses, 🌾 Farming (fertilizer, seeds, diesel, labor, irrigation), and 🏠 Household (groceries, education, medical, bills).
+- Category badges with icons, payment method tracking (Cash, UPI), crop plot links, and item descriptions.
+- Instant total summary breakdown and item deletion.
 
 ### 3. Crop Lifecycle & Plantation Management (फसल चक्र)
-- **Field & Plot Records**: Log active and harvested crops (Wheat, Paddy, Mustard, Soybean, Sugarcane, Cotton, Vegetables) with plot names and acreage.
-- **Event Logging**: Record dates, quantities, and costs for:
-  - Fertilizer top-dressing (Urea, DAP, MOP, Zinc).
-  - Pest and fungicide sprays with dilution ratios.
-  - Irrigation dates.
-- **Harvest & Profit Analysis**: Calculates net farm yield (in quintals), gross market earnings, total crop expenses, and net profit per acre.
-- **AI Crop Schedule Generator**: Generates customized stage-by-stage agronomic management calendars.
+- Plot & crop records with acreage (Acre / Bigha), soil type, sowing date, and growth stage.
+- Fertilizer logs with basal vs top-dressing stage tracking.
+- Spray logs for fungicides, weedicides, and pest management.
+- Harvest records tracking yield in quintals, market sale price, buyer details, and net profit/loss calculation.
 
-### 4. Shagun & Bahi-Khata Ceremony Ledger (शगुन व न्योता)
-- **Traditional Reciprocal Ledger**: Digitizes the traditional notebook used in Indian family ceremonies (Weddings, Kuan Pujan/Baby Showers, Griha Pravesh, Mundan, Festivals).
-- **Dual Flow**: Tracks both **Received (शगुन आया)** and **Given (शगुन दिया)** transactions.
-- **Item & Cash Tracking**: Supports monetary gifts as well as physical offerings (silver coins, sweets, utensils, gold, textiles).
-- **Reciprocal Balance Ledger**: Quickly search by family or village name to view past gifting history, ensuring social etiquette and reciprocal giving are honored accurately.
+### 4. Smart Village Reminders (याद दिलाना)
+- Agricultural reminders (CRI 1st irrigation, DAP cooperative booking).
+- Financial deadlines (KCC loan interest subvention, electricity power roasters, PM-Kisan e-KYC).
+- Priority badges (🔴 High, 🟡 Medium, 🟢 Low) and completed checkoff toggles.
 
-### 5. Village Reminders & Task Alarms (याद दिलाना)
-- **Agricultural Timers**: Tubewell electricity supply shifts (day/night power rostering), canal water turns (*Nehar ki Baari*), pesticide spray intervals.
-- **Financial Deadlines**: Kisan Credit Card (KCC) loan renewals, electricity bill due dates, cooperative society meetings, Mandi auction days.
-- **Priority Indicators**: Flag tasks as Urgent, High, Medium, or Low with one-click completion toggles.
+### 5. Shagun & Neota Registry (शगुन बही)
+- Traditional reciprocal gifting ledger tracking both **Given (दिया)** and **Received (मिला)** shagun.
+- Track recipient/giver name, village/relation, occasion (wedding, mundan, griha pravesh), and counter-gift return settlement status.
 
-### 6. Kisan AI Agronomy Advisor & Tools (किसान सहायक)
-- **Conversational Assistant**: Ask questions in Hindi or English regarding crop diseases, organic pest treatments (Neem oil, Jeevamrit), and fertilizer application rates.
-- **Land Unit Converter**: Converts between regional land measurement units:
-  - *Bigha (Standard / Pucca / Kaccha), Acre, Hectare, Guntha, Kanal, Marla, Biswa, Katha, Square Feet, and Square Meters*.
-- **Fertilizer Calculator**: Computes recommended commercial bags of Urea, DAP, and MOP from target N-P-K nutrient ratios.
+### 6. Village Bahi-Khata (उधार-जमा लेजर)
+- Daily village credit/debit register tracking **You Gave (आपने दिया)** vs **You Took (आपने लिया)**.
+- Running balance indicator (Total Receivable vs Payable).
+- Settle account toggle and phone number linkage.
 
-### 7. Bilingual & Offline-Ready Data Management
-- **Instant Language Switching**: Toggle seamlessly between Hindi (हिंदी) and English across all tabs, forms, charts, and metrics.
-- **Privacy-First Local Storage**: All farm records, financial entries, and reminder data remain stored safely in the user's browser local storage—no compulsory account creation required.
-- **Backup & Restore**: Export all app state into an encrypted/portable JSON file and restore it onto any mobile device or tablet.
+### 7. Agronomy Tools & Live Mandi Rates
+- **Fertilizer Dosage Calculator**: Computes scientific Urea, DAP, Potash, and Zinc requirements by crop and acreage with application schedule.
+- **Live Mandi Rates**: APMC market prices with Government MSP comparison and price trend indicators.
+- **Kisan AI Advisor**: Interactive conversational farming assistance for pest management, irrigation timing, and fertilizer schedules.
+- **Agricultural Helplines**: One-tap access to Kisan Call Center (1800-180-1551), PM-Kisan, and PMFBY insurance assistance.
 
 ---
 
 ## 🛠 Architecture & Tech Stack
 
 ```
-gramin-village-super-app/
-├── server.ts                 # Express full-stack API server + Vite middleware
-├── src/
-│   ├── main.tsx              # React entry point
-│   ├── App.tsx               # Root component & global state coordination
-│   ├── types.ts              # TypeScript interfaces, unions, and data types
-│   ├── components/           # Modular application views and tabs
-│   │   ├── OverviewDashboard.tsx      # Core dashboard & priority feeds
-│   │   ├── WeatherForecastWidget.tsx  # 7-day Google Search grounded weather
-│   │   ├── ExpensesTab.tsx            # Expense logs & filtering
-│   │   ├── ExpenseCategoryPieChart.tsx# Recharts category pie chart
-│   │   ├── PlantationTab.tsx          # Crop cycles, spraying & harvest logs
-│   │   ├── GiftsTab.tsx               # Shagun & ceremonial gift ledger
-│   │   ├── RemindersTab.tsx           # Agricultural & financial reminders
-│   │   ├── ToolsTab.tsx               # Kisan AI advisor & land calculators
-│   │   ├── VoiceInputButton.tsx       # Web Speech API speech-to-text button
-│   │   └── modals/                    # Add/edit forms & backup/restore modal
-│   └── utils/
-│       ├── storage.ts        # LocalStorage persistence & CSV export
-│       └── translations.ts   # Complete Hindi & English translation dictionary
+gramin-android/
+├── app/
+│   ├── build.gradle.kts       # App-level Gradle build configuration
+│   ├── proguard-rules.pro     # ProGuard rules
+│   └── src/main/
+│       ├── AndroidManifest.xml # Permissions & activity declarations
+│       ├── java/com/example/
+│       │   ├── MainActivity.kt # Entry point activity with Edge-to-Edge
+│       │   ├── data/
+│       │   │   ├── model/      # Data entities (Expense, Crop, Reminder, Gift, Bahi)
+│       │   │   ├── local/      # Room database, DAOs, and TypeConverters
+│       │   │   └── repository/ # Seed data, CRUD repository, Fertilizer & AI logic
+│       │   └── ui/
+│       │       ├── GraminApp.kt       # NavigationBar & TopAppBar shell
+│       │       ├── GraminViewModel.kt # State management & UI flows
+│       │       ├── screens/           # Modular Compose screen implementations
+│       │       └── theme/             # Material 3 typography, colors, and shapes
+│       └── res/
+│           ├── values/        # strings.xml, colors.xml, themes.xml
+│           ├── drawable/      # Adaptive launcher foreground, background & art
+│           ├── mipmap-anydpi-v26/ # Adaptive launcher icons
+│           └── xml/           # Backup & data extraction rules
+├── gradle/
+│   └── libs.versions.toml     # Gradle Version Catalog
+├── build.gradle.kts           # Root-level Gradle build
+└── settings.gradle.kts        # Project settings
 ```
 
-- **Frontend**: React 18, TypeScript, Tailwind CSS v4, Motion, Lucide React, Recharts.
-- **Backend**: Express.js with Node.js, `tsx` for live execution, `esbuild` for production bundling.
-- **AI & Grounding**: Google Gen AI SDK (`@google/genai`) with `gemini-3.8-flash` and Google Search Grounding (`tools: [{ googleSearch: {} }]`).
+- **UI Toolkit**: Jetpack Compose with Material Design 3 (M3)
+- **Language**: Kotlin 2.1.0
+- **Database**: Android Room 2.6.1 with SQLite & Kotlinx Serialization
+- **Architecture**: MVVM (Model-View-ViewModel) with Kotlin Coroutines and StateFlow
+- **Minimum SDK**: Android 8.0 (API level 26)
+- **Target SDK**: Android 15 (API level 35)
 
 ---
 
-## 💻 Getting Started
+## 💻 Building the Project
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (version 18 or higher recommended)
-- [npm](https://www.npmjs.com/) or [bun](https://bun.sh/)
-- A Google Gemini API Key (obtainable from [Google AI Studio](https://aistudio.google.com/))
-
-### Installation
-
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/your-username/gramin-village-super-app.git
-   cd gramin-village-super-app
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-### Environment Configuration
-
-Create a `.env` file in the root directory (refer to `.env.example`):
-```env
-GEMINI_API_KEY="your_gemini_api_key_here"
-```
-
-> **Note**: The app includes comprehensive agronomic fallbacks and in-memory caching. If the API key is omitted, core features, local ledger functions, and sample weather advisories will still function smoothly.
-
-### Development Server
-
-Start the full-stack development server:
+Open the project in Android Studio or build via Gradle:
 ```bash
-npm run dev
+./gradlew assembleDebug
 ```
-
-Open your browser and navigate to:
-```
-http://localhost:3000
-```
-
-### Production Build
-
-To build the static frontend assets and bundle the server:
-```bash
-npm run build
-```
-
-To start the production server:
-```bash
-npm start
-```
-
----
-
-## 📡 API Endpoints
-
-The Express server exposes backend endpoints that proxy AI and meteorological services securely:
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/api/weather/forecast` | Fetches a 7-day agricultural weather forecast grounded by Google Search, complete with operation windows (spraying, irrigation, harvesting). |
-| `POST` | `/api/ai/advisor` | Handles bilingual conversational farming and village advisory questions via Gemini. |
-| `POST` | `/api/ai/crop-schedule` | Generates a crop lifecycle management timeline from sowing to harvesting. |
-| `GET` | `/api/health` | Health check probe returning server status. |
-
----
-
-## 🎨 Design & Accessibility Principles
-
-- **High Contrast & Readability**: Clean neutral palettes paired with nature-inspired agricultural tones (emerald green, warm amber, deep blue).
-- **Mobile-First & Touch Targets**: Generous tap targets (minimum 44px) and clear spacing suited for outdoor mobile phone usage under sunlight.
-- **Bilingual By Design**: Every UI control, data card, modal, and advisory note is natively translated into Hindi and English.
-- **Strict Data Security**: Sensitive financial records remain in browser local storage and are never uploaded to third-party databases without explicit user export.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! If you would like to help improve Gramin:
-1. Fork the repository.
-2. Create your feature branch (`git checkout -b feature/crop-disease-scanner`).
-3. Commit your changes (`git commit -m 'Add crop disease scanner support'`).
-4. Push to the branch (`git push origin feature/crop-disease-scanner`).
-5. Open a Pull Request.
+The debug APK will be generated at `app/build/outputs/apk/debug/app-debug.apk`.
 
 ---
 
