@@ -6,3 +6,12 @@ coverage/
 *.log
 .env*
 !.env.example
+# Android / signing (never commit keystores or passwords)
+.gradle/
+.idea/
+local.properties
+*.jks
+*.keystore
+*.p12
+*.aab
+*.apk
