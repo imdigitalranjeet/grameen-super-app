@@ -6,21 +6,37 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+// Release signing details come from environment variables (CI) or gradle
+// properties (local) so no secret is ever committed to the repo.
+fun signingValue(name: String): String? =
+    System.getenv(name) ?: (findProperty(name) as String?)
+
+val releaseStoreFile = signingValue("KEYSTORE_PATH")?.let { file(it) }
+val hasReleaseKeystore = releaseStoreFile != null && releaseStoreFile.exists()
+
 android {
     namespace = "com.example"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.aistudio.gramin.vilsup"
+        applicationId = "com.digitalranjeet.villedger"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 1
+        targetSdk = 36
+        versionCode = (System.getenv("VERSION_CODE") ?: "1").toInt()
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                storeFile = releaseStoreFile
+                storePassword = signingValue("KEYSTORE_PASSWORD")
+                keyAlias = signingValue("KEY_ALIAS")
+                keyPassword = signingValue("KEY_PASSWORD")
+            }
+        }
         getByName("debug") {
             val ks = file("${rootDir}/debug.keystore")
             if (ks.exists()) {
@@ -34,6 +50,9 @@ android {
 
     buildTypes {
         release {
+            if (hasReleaseKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

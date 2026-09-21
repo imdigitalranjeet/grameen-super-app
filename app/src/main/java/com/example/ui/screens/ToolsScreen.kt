@@ -494,7 +494,7 @@ fun KisanAIChatTool(viewModel: GraminViewModel, isHi: Boolean) {
                         CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (isHi) "सलाहकार सोच रहा है..." else "Gramin AI is thinking...",
+                            text = if (isHi) "सलाहकार सोच रहा है..." else "Vil-Ledger AI is thinking...",
                             style = MaterialTheme.typography.bodySmall,
                             color = Color.Gray
                         )

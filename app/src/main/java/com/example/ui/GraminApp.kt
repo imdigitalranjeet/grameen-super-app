@@ -63,7 +63,7 @@ fun GraminApp(viewModel: GraminViewModel) {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = if (isHi) "ग्रामी (Gramin)" else "Gramin Super App",
+                        text = "Vil-Ledger",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
